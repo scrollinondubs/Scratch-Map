@@ -1,18 +1,19 @@
 import { useStateTogether } from 'react-together';
 import { useCallback, useEffect } from 'react';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
-import CustomMarker from './CustomMarker';
+import CustomMarker from './custom-marker';
 
 const mapContainerStyle = {
-  width: '100%',
-  height: '800px',
+  width: '600px',
+  height: '600px',
+  borderRadius: '10px',
+  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
 };
 
 const center = {
   lat: 38.7169,
   lng: -9.1399,
 };
-
 
 const mapOptions = { 
   disableDefaultUI: true,  
@@ -21,7 +22,7 @@ const mapOptions = {
   streetViewControl: false,       
   fullscreenControl: false,      
   scaleControl: false,   
-  draggable: false, 
+  draggable: true, 
   styles: [
     {
       featureType: "water",
@@ -89,7 +90,6 @@ const mapOptions = {
   ],
 };
 
-
 function MapComponent() {
   const [markers, setMarkers] = useStateTogether('map', []);
   console.log('Markers:', markers);
@@ -108,7 +108,7 @@ function MapComponent() {
   }, [markers]);
 
   return (
-    <div className="h-full w-full">
+    <div className="flex justify-center align-middle">
       <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
         <GoogleMap
           id="map"
