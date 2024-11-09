@@ -1,5 +1,5 @@
 import './App.css'
-import StateTogether from './components/stateTogetherEx'
+import StateTogether from './components/state-together-example'
 
 function App() {
 
