@@ -1,11 +1,11 @@
-import { useStateTogether } from 'react-together';
+import PropTypes from 'prop-types';
 import { useCallback, useEffect } from 'react';
 import { GoogleMap, LoadScript } from '@react-google-maps/api';
 import CustomMarker from './custom-marker';
 
 const mapContainerStyle = {
-  width: '600px',
-  height: '600px',
+  width: '700px',
+  height: '700px',
   borderRadius: '10px',
   boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
 };
@@ -90,8 +90,7 @@ const mapOptions = {
   ],
 };
 
-function MapComponent() {
-  const [markers, setMarkers] = useStateTogether('map', []);
+function MapComponent({markers, setMarkers}) {
   console.log('Markers:', markers);
 
   const handleMapClick = useCallback((event) => {
@@ -125,6 +124,12 @@ function MapComponent() {
       </LoadScript> 
     </div>
   );
+
 }
+
+MapComponent.propTypes = {
+  markers: PropTypes.array.isRequired,
+  setMarkers: PropTypes.func.isRequired,
+};
 
 export default MapComponent;
