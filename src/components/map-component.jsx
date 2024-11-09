@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useCallback, useEffect } from 'react';
-import { GoogleMap, LoadScript } from '@react-google-maps/api';
+import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import CustomMarker from './custom-marker';
 import { useState } from 'react';
 
@@ -39,12 +39,11 @@ const mapOptions = {
 ],
 };
 
-function MapComponent({markers, setMarkers}) {
+function MapComponent({ markers, setMarkers, location, locationPerUser }) {
   const [activeMarker, setActiveMarker] = useState(null);
 
   const handleMapClick = useCallback((event) => {
     if (activeMarker) return;
-
 
     const newMarker = {
       lat: event.latLng.lat(),
@@ -52,29 +51,29 @@ function MapComponent({markers, setMarkers}) {
     };
 
     setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
-    setActiveMarker(newMarker)
+    setActiveMarker(newMarker);
   }, [activeMarker, setMarkers]);
 
   const handleSaveNote = (title, comment) => {
     if (!activeMarker) return;
 
-    setMarkers((prevMarkers) => {
-      return prevMarkers.map((marker) =>
+    setMarkers((prevMarkers) =>
+      prevMarkers.map((marker) =>
         marker.lat === activeMarker.lat && marker.lng === activeMarker.lng
-        ? {...marker, title, comment}
-        : marker
+          ? { ...marker, title, comment }
+          : marker
       )
-    })
+    );
 
     setActiveMarker(null);
   };
 
   const handleDeleteNote = (marker) => {
-    setMarkers((prevMarkers) => prevMarkers.filter((m) => m !==marker));
+    setMarkers((prevMarkers) => prevMarkers.filter((m) => m !== marker));
   };
 
   const handleCancel = () => {
-    setMarkers((prevMarkers) => 
+    setMarkers((prevMarkers) =>
       prevMarkers.filter((marker) => marker.lat !== activeMarker.lat || marker.lng !== activeMarker.lng)
     );
     setActiveMarker(null);
@@ -95,49 +94,58 @@ function MapComponent({markers, setMarkers}) {
           onClick={handleMapClick}
           options={mapOptions}
         >
+          {location.lat && location.lng && (
+            <Marker
+              key="current-user"
+              position={location}
+              title="You are here"
+            />
+          )}
+
+          {Object.keys(locationPerUser).map((userId) => {
+            const userLocation = locationPerUser[userId];
+            return (
+              <Marker
+                key={userId}
+                position={userLocation}
+                title={`User ${userId}`}
+              />
+            );
+          })}
+
           {markers.map((marker, index) => (
-            <CustomMarker 
-              key={index} 
-              position={marker} 
+            <CustomMarker
+              key={index}
+              position={marker}
               title={marker.title}
               comment={marker.comment}
               onDelete={() => handleDeleteNote(marker)}
             />
           ))}
         </GoogleMap>
-      </LoadScript> 
+      </LoadScript>
 
-      { activeMarker && (
+      {activeMarker && (
         <div className="mt-20">
           <input
             type="text"
-            placeholder='Enter title'
+            placeholder="Enter title"
             value={activeMarker.title}
-            onChange={(e) => 
-              setActiveMarker((prev) => ({...prev, title: e.target.value}))
-            }
+            onChange={(e) => setActiveMarker({ ...activeMarker, title: e.target.value })}
             className="w-full"
           />
-          <textarea 
+          <textarea
             value={activeMarker.comment}
-            onChange={(e) => 
-              setActiveMarker((prev) => ({...prev, comment: e.target.value}))
-            }
-            placeholder='Enter comment'
+            onChange={(e) => setActiveMarker({ ...activeMarker, comment: e.target.value })}
+            placeholder="Enter comment"
             rows="2"
             className="w-full"
           />
           <div>
-            <button
-              onClick={() => handleSaveNote(activeMarker.title, activeMarker.comment)}
-              className="mt-10 mr-10"
-            >
+            <button onClick={() => handleSaveNote(activeMarker.title, activeMarker.comment)} className="mt-10 mr-10">
               Save Note
             </button>
-            <button
-              onClick={handleCancel}
-              className="mt-10 bg-gray-500 text-white border-none p-5 cursor-pointer"
-            >
+            <button onClick={handleCancel} className="mt-10 bg-gray-500 text-white border-none p-5 cursor-pointer">
               Cancel
             </button>
           </div>
@@ -145,12 +153,21 @@ function MapComponent({markers, setMarkers}) {
       )}
     </div>
   );
-
 }
 
 MapComponent.propTypes = {
   markers: PropTypes.array.isRequired,
   setMarkers: PropTypes.func.isRequired,
+  location: PropTypes.shape({
+    lat: PropTypes.number,
+    lng: PropTypes.number,
+  }).isRequired,
+  locationPerUser: PropTypes.objectOf(
+    PropTypes.shape({
+      lat: PropTypes.number,
+      lng: PropTypes.number,
+    })
+  ).isRequired,
 };
 
 export default MapComponent;

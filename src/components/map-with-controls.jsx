@@ -5,25 +5,32 @@ import ButtonQR from './generate-qr.jsx';
 // import { SessionManager } from 'react-together';
 import AddLocation from './add-location.jsx';
 import LeaveSession from './leave-session.jsx';
-import { useStateTogether } from 'react-together';
+import { useStateTogether, useStateTogetherWithPerUserValues } from 'react-together';
 
 
 function MapWithControls() {
     const [markers, setMarkers] = useStateTogether('map', []);
+    const [location, setLocation, locationPerUser] = useStateTogetherWithPerUserValues('userloc', {});
 
 
     return (
         <div className="grid grid-cols-1 gap-4 justify-center items-center max-w-screen-lg">
             <div className="p-6 flex flex-col gap-6">
-                <MapComponent markers={markers} setMarkers={setMarkers}/>
+                <MapComponent 
+                    markers={markers} 
+                    setMarkers={setMarkers}
+                    location={location}
+                    locationPerUser={locationPerUser}
+                />
             </div>
             <div className="flex justify-around px-2">
-                <AddLocation />
+                <AddLocation location={location} setLocation={setLocation} locationPerUser={locationPerUser}/>
                 <LeaveSession setMarkers={setMarkers}/>
                 <ButtonQR />
             </div>
         </div>
     );
 }
+
 
 export default MapWithControls;
