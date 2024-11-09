@@ -15,7 +15,7 @@ function MapWithControls() {
 
     return (
         <div className="grid grid-cols-1 gap-4 justify-center items-center max-w-screen-lg">
-            <div className="p-6 flex flex-col gap-6">
+            <div className="p-6 flex flex-col gap-5">
                 <MapComponent 
                     markers={markers} 
                     setMarkers={setMarkers}
