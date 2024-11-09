@@ -1,13 +1,13 @@
 import PropTypes from 'prop-types';
 import { useLeaveSession } from 'react-together';
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 
 function LeaveSession({ setMarkers }) {
     const leaveSession = useLeaveSession();
 
-    useEffect(() => {
-        setMarkers([])
-    }, [leaveSession, setMarkers])
+    // useEffect(() => {
+    //     setMarkers([])
+    // }, [leaveSession, setMarkers])
 
     const handleClearMap = () => {
         leaveSession(); 
