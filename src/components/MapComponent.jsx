@@ -8,13 +8,13 @@ const mapContainerStyle = {
   height: '400px',
 };
 const center = {
-  lat: 40.748817,
-  lng: -73.985428,
+  lat: 38.7223,
+  lng: -9.1393,
 };
 
 function MapComponent() {
   return (
-    <LoadScript googleMapsApiKey='AIzaSyDg8hca8PZ2YLCuV79MoarvU98uTVqhy_E'>
+    <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
       <GoogleMap mapContainerStyle={mapContainerStyle} center={center} zoom={10}>
         <Marker position={center} />
       </GoogleMap>
