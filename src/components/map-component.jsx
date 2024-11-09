@@ -25,6 +25,7 @@ const mapOptions = {
   fullscreenControl: false,
   scaleControl: false,
   draggable: true,
+  clickableIcons: false,
   styles: [
     { featureType: "water", elementType: "geometry", stylers: [{ color: "#2b8cbe" }, { visibility: "on" }]},
     { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#a6bddb" }] },
