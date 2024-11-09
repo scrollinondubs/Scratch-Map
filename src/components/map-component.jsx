@@ -16,79 +16,26 @@ const center = {
   lng: -9.1399,
 };
 
-const mapOptions = { 
-  disableDefaultUI: true,  
-  zoomControl: false,            
-  mapTypeControl: false,       
-  streetViewControl: false,       
-  fullscreenControl: false,      
-  scaleControl: false,   
-  draggable: true, 
-  styles: [
-    {
-      featureType: "water",
-      elementType: "geometry",
-      stylers: [
-        {
-          color: "#d3d3d3",
-        },
-      ],
-    },
-    {
-      featureType: "landscape",
-      elementType: "geometry",
-      stylers: [
-        {
-          color: "#8ab8d1", 
-        },
-      ],
-    },
-    {
-      featureType: "road",
-      elementType: "geometry",
-      stylers: [
-        {
-          color: "#ffffff",
-        },
-      ],
-    },
-    {
-      featureType: "road",
-      elementType: "labels",
-      stylers: [
-        {
-          visibility: "off", 
-        },
-      ],
-    },
-    {
-      featureType: "poi",
-      elementType: "labels",
-      stylers: [
-        {
-          visibility: "off", 
-        },
-      ],
-    },
-    {
-      featureType: "poi.park",
-      elementType: "geometry",
-      stylers: [
-        {
-          color: "#8ab8d1",
-        },
-      ],
-    },
-    {
-      elementType: "labels",
-      stylers: [
-        {
-          visibility: "off",
-        },
-      ],
 
-  },
-  ],
+const mapOptions = {
+  disableDefaultUI: true,
+  zoomControl: false,
+  mapTypeControl: false,
+  streetViewControl: false,
+  fullscreenControl: false,
+  scaleControl: false,
+  draggable: true,
+  styles: [
+    { featureType: "water", elementType: "geometry", stylers: [{ color: "#2b8cbe" }, { visibility: "on" }]},
+    { featureType: "landscape", elementType: "geometry", stylers: [{ color: "#a6bddb" }] },
+    { featureType: "road", elementType: "geometry", stylers: [{ color: "#ffffff" }] },
+    { featureType: "road", elementType: "geometry.stroke", stylers: [{ color: "#FFFFED" }] },
+    { featureType: "poi", elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+    { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#ece7f2" }] },
+    { elementType: "labels", stylers: [{ visibility: "off" }] },
+    { elementType: "labels.text", stylers: [{ visibility: "simplified" } ]},
+    { elementType: "labels.icon", stylers: [{ visibility: "off"}]},
+],
 };
 
 function MapComponent({markers, setMarkers}) {
