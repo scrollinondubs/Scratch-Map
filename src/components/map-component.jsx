@@ -6,7 +6,11 @@ import CustomMarker from './custom-marker';
 const mapContainerStyle = {
   width: '700px',
   height: '700px',
-};
+  borderRadius: '15px',  
+  boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
+    overflow: 'hidden',
+  };
+
 
 const center = {
   lat: 38.7169,
@@ -14,7 +18,7 @@ const center = {
 };
 
 const mapOptions = {
-  disableDefaultUI: true,
+  disableDefaultUI: false,
   zoomControl: false,
   mapTypeControl: false,
   streetViewControl: false,

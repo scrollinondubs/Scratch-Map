@@ -31,7 +31,7 @@ const SessionButton = () => {
       <Button 
         onClick={handleButtonClick}
       >
-        <RiQrCodeLine width={24} height={24}/>
+        <RiQrCodeLine size={24}/>
       </Button>
 
       {showQRCodeOverlay && (

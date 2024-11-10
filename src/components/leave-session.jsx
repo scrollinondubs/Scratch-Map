@@ -20,7 +20,7 @@ function LeaveSession({ setLocation, setMarkers }) {
         <Button
             onClick={handleClearMap}
         >
-            <RxCross2 width={24} height={24}/>
+            <RxCross2 size={24}/>
         </Button>
     );
 }

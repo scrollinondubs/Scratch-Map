@@ -33,7 +33,7 @@ function AddLocation({ setLocation }) {
       <Button 
         onClick={() => getUserLocation(setLocation, setError)}
       >
-        <RiCrosshair2Line width={24} height={24}/>
+        <RiCrosshair2Line size={24}/>
       </Button>
       {error && <div className="mt-2 text-red-600">{error}</div>}
     </div>
