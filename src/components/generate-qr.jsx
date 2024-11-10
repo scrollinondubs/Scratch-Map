@@ -27,7 +27,7 @@ const SessionButton = () => {
     <div>
       <button 
         onClick={handleButtonClick}
-        className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-all duration-300"
+        className="p-2 font-semibold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
         {isTogether ? 'Connected to Session' : 'Connect to Session'}
       </button>
@@ -39,7 +39,7 @@ const SessionButton = () => {
             <a href={sessionId} target="_blank">Url</a>
             <button 
               onClick={closeQRCodeOverlay}
-              className="p-2 font-semibold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+              className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-300"
             >
               Close QR
             </button>

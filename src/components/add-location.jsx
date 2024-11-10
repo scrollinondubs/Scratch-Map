@@ -1,7 +1,6 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
 
-
 const getUserLocation = (setUserLocation, setError) => {
   if ('geolocation' in navigator) {
     navigator.geolocation.getCurrentPosition(
@@ -22,8 +21,7 @@ const getUserLocation = (setUserLocation, setError) => {
   }
 };
 
-function AddLocation({location, setLocation, locationPerUser}) {
-
+function AddLocation({ setLocation }) {
   const [error, setError] = useState(null);
 
   return (
@@ -34,40 +32,13 @@ function AddLocation({location, setLocation, locationPerUser}) {
       >
         Get User Location
       </button>
-      <div>
-        {error && <p className="text-red-500">{error}</p>}
-
-        {location && location.lat && location.lng && (
-          <div>
-            <p>Your location: {location.lat}, {location.lng}</p>
-          </div>
-        )}
-
-        {Object.keys(locationPerUser).map((userId) => {
-          const userLocation = locationPerUser[userId];
-          return (
-            <div key={userId}>
-              <p>User {userId} location: {userLocation.lat}, {userLocation.lng}</p>
-            </div>
-          );
-        })}
-      </div>
+      {error && <div className="mt-2 text-red-600">{error}</div>}
     </div>
   );
 }
 
 AddLocation.propTypes = {
-  location: PropTypes.shape({
-    lat: PropTypes.number,
-    lng: PropTypes.number,
-  }).isRequired,
   setLocation: PropTypes.func.isRequired,
-  locationPerUser: PropTypes.objectOf(
-    PropTypes.shape({
-      lat: PropTypes.number,
-      lng: PropTypes.number,
-    })
-  ).isRequired,
 };
 
 export default AddLocation;

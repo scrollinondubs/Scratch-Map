@@ -26,7 +26,7 @@ function MapWithControls() {
                 />
             </div>
             <div className="flex justify-around px-2">
-                <AddLocation location={location} setLocation={setLocation} locationPerUser={locationPerUser}/>
+                <AddLocation location={location} setLocation={setLocation}/>
                 <LeaveSession setLocation={setLocation} setMarkers={setMarkers}/>
                 <ButtonQR />
             </div>
