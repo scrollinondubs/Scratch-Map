@@ -1,17 +1,18 @@
 import PropTypes from 'prop-types';
-import { useLeaveSession } from 'react-together';
-// import { useEffect } from 'react';
+import { useLeaveSession, useIsTogether } from 'react-together';
 
-function LeaveSession({ setMarkers }) {
+function LeaveSession({ setLocation, setMarkers }) {
     const leaveSession = useLeaveSession();
-
-    // useEffect(() => {
-    //     setMarkers([])
-    // }, [leaveSession, setMarkers])
+    const isTogether = useIsTogether();
 
     const handleClearMap = () => {
-        leaveSession(); 
-        setMarkers([]);  
+        if (isTogether) {
+            leaveSession(); 
+        } else {
+            setLocation([]);
+            setMarkers([]);
+        }
+        
     };
 
     return (
@@ -26,6 +27,7 @@ function LeaveSession({ setMarkers }) {
 
 LeaveSession.propTypes = {
     setMarkers: PropTypes.func.isRequired,
+    setLocation: PropTypes.func.isRequired,
 };
 
 export default LeaveSession;
