@@ -54,19 +54,19 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
     setActiveMarker(newMarker);
   }, [activeMarker, setMarkers]);
 
-  const handleSaveNote = (title, comment) => {
+  const handleSaveNote = (comment) => {
     if (!activeMarker) return;
-
+  
     setMarkers((prevMarkers) =>
       prevMarkers.map((marker) =>
         marker.lat === activeMarker.lat && marker.lng === activeMarker.lng
-          ? { ...marker, title, comment }
+          ? { ...marker, comment }
           : marker
       )
     );
-
     setActiveMarker(null);
   };
+  
 
   const handleDeleteNote = (marker) => {
     setMarkers((prevMarkers) => prevMarkers.filter((m) => m !== marker));
@@ -98,7 +98,6 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
             <Marker
               key="current-user"
               position={location}
-              title="You are here"
             />
           )}
 
@@ -108,7 +107,6 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
               <Marker
                 key={userId}
                 position={userLocation}
-                title={`User ${userId}`}
               />
             );
           })}
@@ -117,7 +115,6 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
             <CustomMarker
               key={index}
               position={marker}
-              title={marker.title}
               comment={marker.comment}
               onDelete={() => handleDeleteNote(marker)}
             />
@@ -128,24 +125,16 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
       {activeMarker && (
         <div className="mt-20">
           <input
-            type="text"
-            placeholder="Enter title"
-            value={activeMarker.title}
-            onChange={(e) => setActiveMarker({ ...activeMarker, title: e.target.value })}
-            className="w-full"
-          />
-          <textarea
             value={activeMarker.comment}
             onChange={(e) => setActiveMarker({ ...activeMarker, comment: e.target.value })}
             placeholder="Enter comment"
-            rows="2"
             className="w-full"
           />
           <div>
-            <button onClick={() => handleSaveNote(activeMarker.title, activeMarker.comment)} className="mt-10 mr-10">
+            <button onClick={() => handleSaveNote(activeMarker.comment)} className="mt-10 mr-10 text-white">
               Save Note
             </button>
-            <button onClick={handleCancel} className="mt-10 bg-gray-500 text-white border-none p-5 cursor-pointer">
+            <button onClick={handleCancel} className="bg-gray-500 text-white border-none p-5 cursor-pointer">
               Cancel
             </button>
           </div>
