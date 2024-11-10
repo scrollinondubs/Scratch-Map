@@ -134,15 +134,22 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
           <input
             value={activeMarker.comment || ''}
             onChange={(e) => setActiveMarker({ ...activeMarker, comment: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSaveNote(activeMarker.comment);
+              }
+            }}
             placeholder="Enter comment"
             className="w-full p-1 border border-gray-300 rounded-md text-nowrap"
+            onSubmit={() => handleSaveNote(activeMarker.comment)}
           />
-          <div className="flex justify-between mt-2">
+          <div className="flex justify-between gap-2 mt-2">
             <button
               onClick={() => handleSaveNote(activeMarker.comment)}
-              className="px-4 py-1 text-white bg-slate-600 hover:bg-slate-700 rounded-md"
+              className="px-4 py-1 text-white bg-blue-700 hover:bg-blue-800 rounded-md"
             >
-              Save Note
+              Save
             </button>
             <button
               onClick={handleCancel}
