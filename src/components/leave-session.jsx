@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useLeaveSession, useIsTogether } from 'react-together';
-import Button from './ui/button';
+import IconButton from './ui/button';
 import { RxCross2 } from "react-icons/rx";
 
 function LeaveSession({ setLocation, setMarkers }) {
@@ -17,11 +17,11 @@ function LeaveSession({ setLocation, setMarkers }) {
     };
 
     return (
-        <Button
+        <IconButton
             onClick={handleClearMap}
         >
             <RxCross2 size={24}/>
-        </Button>
+        </IconButton>
     );
 }
 

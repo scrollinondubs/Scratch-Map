@@ -2,6 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
+html {
     @apply bg-slate-900
 }

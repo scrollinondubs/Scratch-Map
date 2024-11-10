@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
-import Button from './ui/button';
+import IconButton from './ui/button';
 import { RiCrosshair2Line } from "react-icons/ri";
 
 
@@ -30,11 +30,11 @@ function AddLocation({ setLocation }) {
 
   return (
     <div>
-      <Button 
+      <IconButton 
         onClick={() => getUserLocation(setLocation, setError)}
       >
         <RiCrosshair2Line size={24}/>
-      </Button>
+      </IconButton>
       {error && <div className="mt-2 text-red-600">{error}</div>}
     </div>
   );
