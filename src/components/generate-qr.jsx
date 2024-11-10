@@ -21,9 +21,8 @@ const SessionButton = () => {
   const handleButtonClick = () => {
     if (!isTogether) {
       createRandomSession();
-    } else {
-      setShowQRCodeOverlay(true); // Show the QR code overlay if already connected
-    }
+    } 
+    setShowQRCodeOverlay(true);
   };
 
   const copyToClipboard = () => {
