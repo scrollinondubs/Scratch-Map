@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import QRCode from 'react-qr-code';
 import { useCreateRandomSession, useIsTogether, useJoinUrl } from 'react-together';
+import Button from './ui/button';
 
 const SessionButton = () => {
   const [showQRCodeOverlay, setShowQRCodeOverlay] = useState(false);
@@ -25,12 +26,11 @@ const SessionButton = () => {
 
   return (
     <div>
-      <button 
+      <Button 
         onClick={handleButtonClick}
-        className="p-2 font-semibold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
         {isTogether ? 'Connected to Session' : 'Connect to Session'}
-      </button>
+      </Button>
 
       {showQRCodeOverlay && (
         <div className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 flex justify-center items-center">

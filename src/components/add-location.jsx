@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types';
 import { useState } from 'react';
+import Button from './ui/button';
+
 
 const getUserLocation = (setUserLocation, setError) => {
   if ('geolocation' in navigator) {
@@ -26,12 +28,11 @@ function AddLocation({ setLocation }) {
 
   return (
     <div>
-      <button 
-        className="p-2 font-semibold text-white bg-blue-500 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+      <Button 
         onClick={() => getUserLocation(setLocation, setError)}
       >
         Get User Location
-      </button>
+      </Button>
       {error && <div className="mt-2 text-red-600">{error}</div>}
     </div>
   );
