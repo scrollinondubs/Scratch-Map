@@ -1,12 +1,13 @@
-// src/components/CustomMarker.jsx
 import PropTypes from 'prop-types';
 import {useState} from 'react';
 import { Marker, InfoWindow } from '@react-google-maps/api';
 import { TbBrandGoogleMaps } from "react-icons/tb";
+// import { useConnectedUsers } from 'react-together';
 
 
 const CustomMarker = ({ position, comment, onDelete }) => {
   const [showInfoWindow, setShowInfoWindow] = useState(false);
+  // const connectedUsers = useConnectedUsers();
 
   const handleMarkerClick = () => {
     setShowInfoWindow((prev) => !prev);
@@ -17,15 +18,15 @@ const CustomMarker = ({ position, comment, onDelete }) => {
   return (
     <div>
       <Marker
-        position={position} // Google Maps expects the position as lat/lng
+        position={position}
         icon={{
           // eslint-disable-next-line no-undef
           path: google.maps.SymbolPath.CIRCLE,
-          scale: 6, // Size of the circle
+          scale: 6,
           fillColor: 'blue',
           fillOpacity: 1,
           strokeColor: 'white',
-          strokeWeight: 2,
+          strokeWeight: 1,
         }}
         onClick={handleMarkerClick}
       />
