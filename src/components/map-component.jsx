@@ -135,18 +135,18 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
             value={activeMarker.comment || ''}
             onChange={(e) => setActiveMarker({ ...activeMarker, comment: e.target.value })}
             placeholder="Enter comment"
-            className="w-full p-2 border border-gray-300 rounded-md"
+            className="w-full p-1 border border-gray-300 rounded-md text-nowrap"
           />
           <div className="flex justify-between mt-2">
             <button
               onClick={() => handleSaveNote(activeMarker.comment)}
-              className="px-4 py-2 text-white bg-blue-500 rounded-md"
+              className="px-4 py-1 text-white bg-slate-600 hover:bg-slate-700 rounded-md"
             >
               Save Note
             </button>
             <button
               onClick={handleCancel}
-              className="px-4 py-2 text-white bg-gray-500 rounded-md"
+              className="px-4 py-1 text-white bg-gray-500 hover:bg-gray-600 rounded-md"
             >
               Cancel
             </button>
