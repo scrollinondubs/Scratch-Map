@@ -2,6 +2,8 @@ import { useState } from 'react';
 import QRCode from 'react-qr-code';
 import { useCreateRandomSession, useIsTogether, useJoinUrl } from 'react-together';
 import Button from './ui/button';
+import { RiQrCodeLine } from "react-icons/ri";
+
 
 const SessionButton = () => {
   const [showQRCodeOverlay, setShowQRCodeOverlay] = useState(false);
@@ -29,7 +31,7 @@ const SessionButton = () => {
       <Button 
         onClick={handleButtonClick}
       >
-        {isTogether ? 'Connected to Session' : 'Connect to Session'}
+        <RiQrCodeLine width={24} height={24}/>
       </Button>
 
       {showQRCodeOverlay && (
