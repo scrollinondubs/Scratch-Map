@@ -3,15 +3,18 @@ import { useState } from 'react';
 import IconButton from './ui/button';
 import { RiCrosshair2Line } from "react-icons/ri";
 
-
+const addRandomNoise = (value) => {
+  const noise = (Math.random() - 0.5) * 0.0001;
+  return value + noise;
+};
 
 const getUserLocation = (setUserLocation, setError) => {
   if ('geolocation' in navigator) {
     navigator.geolocation.getCurrentPosition(
       (position) => {
         const newLocation = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
+          lat: addRandomNoise(position.coords.latitude),
+          lng: addRandomNoise(position.coords.longitude),
         };
         setUserLocation(newLocation);
         setError(null);
