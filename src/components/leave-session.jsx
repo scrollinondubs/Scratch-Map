@@ -12,7 +12,6 @@ function LeaveSession({ setLocation, setMarkers }) {
             setLocation([]);
             setMarkers([]);
         }
-        
     };
 
     return (
