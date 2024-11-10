@@ -17,7 +17,7 @@ function MapWithControls() {
 
 
     return (
-        <div className="grid grid-cols-1 gap-4 justify-center items-center max-w-screen-lg">
+        <div className="relative grid grid-cols-1 gap-4 justify-center items-center max-w-screen-lg">
             <div className="p-6 flex flex-col gap-5">
                 <MapComponent 
                     markers={markers} 
@@ -31,12 +31,11 @@ function MapWithControls() {
                 <LeaveSession setLocation={setLocation} setMarkers={setMarkers}/>
                 <ButtonQR />
             </div>
-            {isTogether && <div className="flex justify-center items-center px-4 py-6 rounded-lg shadow-md">
-                <h3 className="text-lg font-semibold text-gray-100 mr-4">
-                    Users Connected:
-                </h3>
-                <ConnectedUsers />
-            </div>}
+            {isTogether && (
+                <div className="absolute top-10 right-10 p-2 rounded-2xl shadow-lg flex justify-center items-center bg-opacity-35 bg-slate-900">
+                    <ConnectedUsers maxAvatars={5} />
+                </div>
+            )}
         </div>
     );
 }
