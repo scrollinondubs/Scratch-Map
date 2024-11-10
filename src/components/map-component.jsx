@@ -4,8 +4,8 @@ import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import CustomMarker from './custom-marker';
 
 const mapContainerStyle = {
-  width: '700px',
-  height: '700px',
+  width: '600px',
+  height: '600px',
   borderRadius: '15px',  
   boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
     overflow: 'hidden',
