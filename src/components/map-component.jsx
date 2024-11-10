@@ -93,7 +93,7 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
           id="map"
           mapContainerStyle={mapContainerStyle}
           center={center}
-          zoom={10}
+          zoom={12}
           onClick={handleMapClick}
           options={mapOptions}
           className="rounded-lg shadow-lg"
