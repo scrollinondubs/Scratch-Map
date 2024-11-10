@@ -2,7 +2,7 @@
 import MapComponent from './map-component.jsx';
 // import MapTest from './components/map-test.jsx';
 import ButtonQR from './generate-qr.jsx';
-import { ConnectedUsers } from 'react-together';
+import { ConnectedUsers, useIsTogether } from 'react-together';
 import AddLocation from './add-location.jsx';
 import LeaveSession from './leave-session.jsx';
 import useMyStateTogether from '../hooks/useMyStateTogether.js';
@@ -13,6 +13,7 @@ const EMPTY_OBJECT = {}
 function MapWithControls() {
     const [markers, setMarkers] = useMyStateTogether('map', []);
     const [location, setLocation, locationPerUser] = useMyStateTogetherWithPerUserValues('userloc', EMPTY_OBJECT);
+    const isTogether = useIsTogether();
 
 
     return (
@@ -30,12 +31,12 @@ function MapWithControls() {
                 <LeaveSession setLocation={setLocation} setMarkers={setMarkers}/>
                 <ButtonQR />
             </div>
-            <div className="flex justify-center items-center px-4 py-6 rounded-lg shadow-md">
+            {isTogether && <div className="flex justify-center items-center px-4 py-6 rounded-lg shadow-md">
                 <h3 className="text-lg font-semibold text-gray-100 mr-4">
                     Users Connected:
                 </h3>
                 <ConnectedUsers />
-            </div>
+            </div>}
         </div>
     );
 }
