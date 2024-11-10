@@ -23,3 +23,12 @@ VITE_SESSION_PASSWORD="postgres"
 - Click on the Comment to open Google Maps.
 - Real-Time Updates: All pins and comments update live.
 - Remove Pins: Only the user who created a pin can delete it by clicking Delete on their pin.
+
+## Google Maps API
+Enable the following APIs for your project:
+- Geolocation API
+- Geocoding API
+- Maps Embed API
+- Maps JavaScript API
+- Places API
+- Places API (New)

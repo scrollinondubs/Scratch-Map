@@ -26,6 +26,59 @@ export const extractPlaceIdFromUrl = (url) => {
   };
   
   /**
+ * Creates a Google Maps sharing URL from a list of markers
+ * @param {Array} markers - Array of marker objects with lat and lng properties
+ * @returns {string} Google Maps URL that can be shared
+ */
+export const createGoogleMapsUrl = (markers) => {
+    if (!markers || markers.length === 0) {
+      throw new Error('No locations to export');
+    }
+  
+    try {
+      // Base URL for Google Maps
+      const baseUrl = 'https://www.google.com/maps/dir/';
+      
+      // Convert markers to URL parameters
+      const locationParams = markers.map(marker => {
+        if (!marker.lat || !marker.lng) {
+          throw new Error('Invalid marker data: missing coordinates');
+        }
+        return `${marker.lat},${marker.lng}`;
+      }).join('/');
+  
+      // Create the full URL
+      const fullUrl = `${baseUrl}${locationParams}`;
+      
+      // Google Maps has a URL length limit of approximately 2048 characters
+      if (fullUrl.length > 2048) {
+        throw new Error('Too many locations to export to Google Maps (URL length exceeded)');
+      }
+  
+      return fullUrl;
+    } catch (error) {
+      throw new Error(`Failed to create Google Maps URL: ${error.message}`);
+    }
+  };
+  
+  /**
+   * Opens the Google Maps URL in a new tab and copies it to clipboard
+   * @param {string} url - Google Maps URL
+   * @returns {Promise<void>}
+   */
+  export const shareGoogleMapsUrl = async (url) => {
+    try {
+      // Copy to clipboard
+      await navigator.clipboard.writeText(url);
+      
+      // Open in new tab
+      window.open(url, '_blank');
+    } catch (error) {
+      throw new Error(`Failed to share Google Maps URL: ${error.message}`);
+    }
+  };
+  
+  /**
    * Fetches place details using Google Places API
    */
   export const getPlaceDetails = async (placeId) => {
