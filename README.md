@@ -13,6 +13,8 @@ VITE_API_KEY=your-api-key-here
 VITE_APP_ID=your-app-id-here
 VITE_SESSION_NAME="postgres"
 VITE_SESSION_PASSWORD="postgres"
+VITE_GOOGLE_MAPS_API_KEY=your-api-key-here
+GOOGLE_MAPS_SERVER_API_KEY==your-server-api-key-here
 ```
 
 ## Interactive Map Instructions

@@ -1,88 +1,67 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import PropTypes from 'prop-types';
 import { RxDownload } from "react-icons/rx";
 import Button from './button';
-import { extractPlaceIdFromUrl, getPlaceDetails } from '../../utils/google-maps';
-import { parseKML } from '../../utils/kml-parser';
+import { parseGoogleMapsUrl } from '../../utils/google-maps';
 
 function ImportDialog({ setMarkers }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [inputUrl, setInputUrl] = useState('');
+  const [url, setUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const fileInputRef = useRef(null);
+  const [success, setSuccess] = useState('');
 
-  const handleGoogleMapsImport = async () => {
-    setError('');
-    setIsLoading(true);
-    
-    try {
-      // Validate input
-      if (!inputUrl) {
-        throw new Error('Please enter a Google Maps URL');
-      }
-
-      // Extract place ID from URL
-      const placeId = extractPlaceIdFromUrl(inputUrl);
-      if (!placeId) {
-        throw new Error('Invalid Google Maps URL. Please make sure you\'re sharing a place link.');
-      }
-
-      // Fetch place details
-      const placeDetails = await getPlaceDetails(placeId);
-      
-      // Add new marker
-      const newMarker = {
-        lat: placeDetails.geometry.location.lat(),
-        lng: placeDetails.geometry.location.lng(),
-        comment: `${placeDetails.name}\n${placeDetails.formatted_address}`,
-      };
-
-      setMarkers(currentMarkers => [...currentMarkers, newMarker]);
-      setIsOpen(false);
-      setInputUrl('');
-      
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setIsLoading(false);
+  const handleImport = async () => {
+    if (!url.trim()) {
+      setError('Please enter a Google Maps URL');
+      return;
     }
-  };
 
-  const handleKMLImport = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setError('');
     setIsLoading(true);
+    setError('');
+    setSuccess('');
 
     try {
-      // Validate file type
-      if (!file.name.toLowerCase().endsWith('.kml')) {
-        throw new Error('Please select a valid KML file');
+      // Clean up the URL - remove any trailing whitespace or line breaks
+      const cleanUrl = url.trim();
+      
+      // Basic URL validation before making the API call
+      if (!cleanUrl.includes('google.com/maps') && !cleanUrl.includes('maps.app.goo.gl')) {
+        throw new Error('Please enter a valid Google Maps URL');
       }
 
-      // Read file content
-      const content = await file.text();
+      const locations = await parseGoogleMapsUrl(cleanUrl);
       
-      // Parse KML and extract markers
-      const newMarkers = parseKML(content);
-      
-      if (newMarkers.length === 0) {
-        throw new Error('No valid locations found in the KML file');
+      if (!locations || locations.length === 0) {
+        throw new Error('No valid locations found in the URL');
       }
 
-      // Add new markers
-      setMarkers(currentMarkers => [...currentMarkers, ...newMarkers]);
-      setIsOpen(false);
+      setMarkers(prevMarkers => [
+        ...prevMarkers,
+        ...locations.map(loc => ({
+          lat: loc.lat,
+          lng: loc.lng,
+          name: loc.name || `Location at ${loc.lat.toFixed(6)}, ${loc.lng.toFixed(6)}`,
+          address: loc.address || ''
+        }))
+      ]);
+
+      setSuccess(`Successfully imported ${locations.length} location${locations.length !== 1 ? 's' : ''}`);
       
-      // Reset file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      // Clear the input and close dialog after a delay
+      setTimeout(() => {
+        setIsOpen(false);
+        setUrl('');
+        setSuccess('');
+      }, 2000);
 
     } catch (error) {
-      setError(error.message);
+      console.error('Import error:', error);
+      if (error.message.includes('Failed to fetch')) {
+        setError('Unable to process shortened URL. Please use the full Google Maps URL by copying from your browser\'s address bar.');
+      } else {
+        setError(error.message);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -100,80 +79,65 @@ function ImportDialog({ setMarkers }) {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
       <div className="bg-slate-900 rounded-lg shadow-xl max-w-md w-full p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold text-slate-100">Import Locations</h2>
+          <h2 className="text-xl font-semibold text-white">Import Locations</h2>
           <button
             onClick={() => setIsOpen(false)}
-            className="text-slate-400 hover:text-slate-100"
+            className="text-slate-300 hover:text-white transition-colors"
           >
             <RxDownload size={20} className="rotate-45" />
           </button>
         </div>
 
-        <div className="grid gap-4">
-          {/* Google Maps Import Section */}
-          <div className="grid gap-2">
-            <label htmlFor="googleMapsUrl" className="text-sm font-medium text-slate-100">
+        <div className="space-y-4">
+          <div>
+            <label htmlFor="maps-url" className="block text-lg font-medium text-white mb-2">
               Google Maps URL
             </label>
             <input
-              id="googleMapsUrl"
-              type="url"
+              id="maps-url"
+              type="text"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
               placeholder="Paste Google Maps URL here"
-              className="flex h-10 w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-600"
-              value={inputUrl}
-              onChange={(e) => setInputUrl(e.target.value)}
+              className="w-full px-4 py-2 rounded-md bg-slate-800 text-white placeholder-slate-400 border border-slate-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
             />
-            <Button 
-              onClick={handleGoogleMapsImport}
-              disabled={isLoading}
-              className="flex items-center gap-2"
-            >
-              <RxDownload size={18} />
-              {isLoading ? 'Importing from Google Maps...' : 'Import from Google Maps'}
-            </Button>
-
-            <div className="text-sm text-slate-400">
-              <p>How to get a Google Maps URL:</p>
-              <ol className="list-decimal list-inside mt-1">
-                <li>Open Google Maps and find a place</li>
-                <li>Click "Share" or copy the URL from your browser</li>
-                <li>Paste the URL here</li>
-              </ol>
-            </div>
           </div>
 
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-slate-700"></span>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-slate-900 px-2 text-slate-400">or</span>
-            </div>
-          </div>
-
-          {/* KML Import Section */}
-          <div className="grid gap-2">
-            <label htmlFor="kmlFile" className="text-sm font-medium text-slate-100">
-              KML File
-            </label>
-            <input
-              ref={fileInputRef}
-              id="kmlFile"
-              type="file"
-              accept=".kml"
-              onChange={handleKMLImport}
-              className="flex w-full rounded-md border border-slate-700 bg-slate-800 px-3 py-2 text-sm text-slate-100 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-700 file:text-slate-100 hover:file:bg-slate-600"
-            />
-            <p className="text-sm text-slate-400">
-              Upload a KML file exported from Google Earth or other mapping tools
-            </p>
-          </div>
+          <button 
+            onClick={handleImport}
+            disabled={isLoading}
+            className={`w-full flex items-center gap-2 justify-center bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-md transition-colors ${
+              isLoading ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
+          >
+            <RxDownload size={18} />
+            <span>{isLoading ? 'Importing...' : 'Import from Google Maps'}</span>
+          </button>
 
           {error && (
-            <p className="text-sm text-red-400 bg-red-950/50 p-2 rounded-md">
+            <p className="text-sm text-red-400 bg-red-900/20 p-3 rounded-md">
               {error}
             </p>
           )}
+
+          {success && (
+            <p className="text-sm text-green-400 bg-green-900/20 p-3 rounded-md">
+              {success}
+            </p>
+          )}
+
+          <div className="mt-4 space-y-2">
+            <h3 className="text-lg font-medium text-white">How to get a Google Maps URL:</h3>
+            <ol className="space-y-2 text-slate-300">
+              <li>1. Open Google Maps in your browser</li>
+              <li>2. Search for a place or multiple places</li>
+              <li>3. Copy the full URL from your browser's address bar</li>
+            </ol>
+            <p className="text-sm text-slate-400">
+              To import multiple locations, share the results of a search or a list of places.
+              Shortened URLs (maps.app.goo.gl) may not work - please use the full URL instead.
+            </p>
+          </div>
         </div>
       </div>
     </div>

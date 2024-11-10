@@ -1,36 +1,237 @@
-/**
- * Extracts place ID from a Google Maps URL
- * Handles various URL formats from Google Maps
- */
-export const extractPlaceIdFromUrl = (url) => {
-    try {
-      const urlObj = new URL(url);
-      // Extract place_id from URL parameters
-      const params = new URLSearchParams(urlObj.search);
-      const placeId = params.get('place_id');
-      
-      if (placeId) return placeId;
+// src/utils/google-maps.js
+
+const GOOGLE_MAPS_URL_PATTERNS = {
+    PLACE: /\/place\/([^\/]+)\/?/,
+    SEARCH: /\/search\/([^\/]+)\/?/,
+    COORDS: /@(-?\d+\.\d+),(-?\d+\.\d+)/,
+    MAPS_SHORT: /maps\.app\.goo\.gl\//
+  };
   
-      // If no place_id in params, try to extract from path
-      const pathParts = urlObj.pathname.split('/');
-      const placeIndex = pathParts.indexOf('place');
-      if (placeIndex !== -1 && pathParts[placeIndex + 1]) {
-        return pathParts[placeIndex + 1];
-      }
+  /**
+   * Loads required Google Maps libraries
+   * @returns {Promise<{Map: any, PlacesService: any}>}
+   */
+  const loadMapsLibraries = async () => {
+    try {
+      const [mapsLibrary, placesLibrary] = await Promise.all([
+        google.maps.importLibrary("maps"),
+        google.maps.importLibrary("places")
+      ]);
       
-      return null;
+      return {
+        Map: mapsLibrary.Map,
+        PlacesService: placesLibrary.PlacesService
+      };
     } catch (error) {
-      console.error('Invalid URL:', error);
-      return null;
+      throw new Error(`Failed to load Google Maps libraries: ${error.message}`);
     }
   };
   
   /**
- * Creates a Google Maps sharing URL from a list of markers
- * @param {Array} markers - Array of marker objects with lat and lng properties
- * @returns {string} Google Maps URL that can be shared
- */
-export const createGoogleMapsUrl = (markers) => {
+   * Extracts search parameters from a Google Maps search URL
+   */
+  const extractSearchParams = (url) => {
+    try {
+      const urlObj = new URL(url);
+      
+      // Extract the search query from the path
+      const searchMatch = urlObj.pathname.match(/\/search\/([^/@]+)/);
+      const query = searchMatch ? decodeURIComponent(searchMatch[1].replace(/\+/g, ' ')) : '';
+  
+      // Extract coordinates and zoom level
+      const coordsMatch = url.match(/@(-?\d+\.\d+),(-?\d+\.\d+),(\d+(\.\d+)?)(z|m)/);
+      const center = coordsMatch ? {
+        lat: parseFloat(coordsMatch[1]),
+        lng: parseFloat(coordsMatch[2])
+      } : null;
+  
+      if (!query || !center) {
+        throw new Error('Could not extract search parameters from URL');
+      }
+  
+      return { query, center };
+    } catch (error) {
+      throw new Error(`Failed to parse search parameters: ${error.message}`);
+    }
+  };
+  
+  /**
+   * Searches for places using text search
+   */
+
+const searchPlaces = async (searchParams) => {
+    try {
+      const { Map, PlacesService } = await loadMapsLibraries();
+      
+      const mapDiv = document.createElement('div');
+      const map = new Map(mapDiv);
+      const service = new PlacesService(map);
+  
+      console.log('Search params:', {
+        query: searchParams.query,
+        location: searchParams.center,
+        radius: 5000
+      });
+  
+      return new Promise((resolve, reject) => {
+        service.textSearch(
+          {
+            query: searchParams.query,
+            location: new google.maps.LatLng(searchParams.center.lat, searchParams.center.lng),
+            radius: 5000 // 5km radius
+          },
+          (results, status) => {
+            console.log('Places API response status:', status);
+            if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+              console.log('Found places:', results.length);
+              const formattedResults = results.map(place => ({
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng(),
+                name: place.name,
+                address: place.formatted_address || place.vicinity || ''
+              }));
+              resolve(formattedResults);
+            } else {
+              console.error('Places API error:', {
+                status,
+                query: searchParams.query,
+                location: searchParams.center
+              });
+              reject(new Error(`Place search failed: ${status}`));
+            }
+          }
+        );
+      });
+    } catch (error) {
+      console.error('Search error:', error);
+      throw new Error(`Search failed: ${error.message}`);
+    }
+  };
+  
+  /**
+   * Fetches place details using Google Places API
+   */
+  const getPlaceDetails = async (placeId) => {
+    try {
+      const { Map, PlacesService } = await loadMapsLibraries();
+      
+      const mapDiv = document.createElement('div');
+      const map = new Map(mapDiv);
+      const service = new PlacesService(map);
+  
+      return new Promise((resolve, reject) => {
+        service.getDetails(
+          {
+            placeId: placeId,
+            fields: ['name', 'geometry', 'formatted_address']
+          },
+          (place, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && place) {
+              resolve({
+                lat: place.geometry.location.lat(),
+                lng: place.geometry.location.lng(),
+                name: place.name,
+                address: place.formatted_address
+              });
+            } else {
+              reject(new Error(`Place details request failed: ${status}`));
+            }
+          }
+        );
+      });
+    } catch (error) {
+      throw new Error(`Failed to get place details: ${error.message}`);
+    }
+  };
+  
+  /**
+   * Extracts location information from a Google Maps URL
+   */
+  const extractLocationFromUrl = async (url) => {
+    try {
+      const urlObj = new URL(url);
+      const params = new URLSearchParams(urlObj.search);
+      const path = urlObj.pathname;
+  
+      // Check if it's a search URL
+      if (path.includes('/search/')) {
+        const searchParams = extractSearchParams(url);
+        return {
+          type: 'SEARCH',
+          ...searchParams
+        };
+      }
+  
+      // Check for place_id in query parameters
+      const placeId = params.get('place_id');
+      if (placeId) {
+        return { type: 'PLACE', id: placeId };
+      }
+  
+      // Check for place in the path
+      const placeMatch = path.match(GOOGLE_MAPS_URL_PATTERNS.PLACE);
+      if (placeMatch) {
+        return {
+          type: 'PLACE',
+          id: decodeURIComponent(placeMatch[1].split('/')[0])
+        };
+      }
+  
+      // Check for coordinates in the URL
+      const coordsMatch = url.match(GOOGLE_MAPS_URL_PATTERNS.COORDS);
+      if (coordsMatch) {
+        return {
+          type: 'COORDS',
+          lat: parseFloat(coordsMatch[1]),
+          lng: parseFloat(coordsMatch[2])
+        };
+      }
+  
+      throw new Error('Unsupported URL format');
+    } catch (error) {
+      throw new Error(`Invalid Google Maps URL: ${error.message}`);
+    }
+  };
+  
+  /**
+   * Parses a Google Maps URL and returns location data
+   * @param {string} url - Google Maps URL
+   * @returns {Promise<Array>} Array of location objects
+   */
+  export const parseGoogleMapsUrl = async (url) => {
+    try {
+      const locationInfo = await extractLocationFromUrl(url);
+  
+      switch (locationInfo.type) {
+        case 'SEARCH':
+          return await searchPlaces(locationInfo);
+        
+        case 'PLACE':
+          const placeDetails = await getPlaceDetails(locationInfo.id);
+          return [placeDetails];
+        
+        case 'COORDS':
+          return [{
+            lat: locationInfo.lat,
+            lng: locationInfo.lng,
+            name: `Location at ${locationInfo.lat.toFixed(6)}, ${locationInfo.lng.toFixed(6)}`,
+            address: ''
+          }];
+        
+        default:
+          throw new Error('Unsupported location type');
+      }
+    } catch (error) {
+      throw new Error(`Failed to parse Google Maps URL: ${error.message}`);
+    }
+  };
+  
+  /**
+   * Creates a Google Maps sharing URL from a list of markers
+   * @param {Array} markers - Array of marker objects with lat and lng properties
+   * @returns {string} Google Maps URL that can be shared
+   */
+  export const createGoogleMapsUrl = (markers) => {
     if (!markers || markers.length === 0) {
       throw new Error('No locations to export');
     }
@@ -76,33 +277,4 @@ export const createGoogleMapsUrl = (markers) => {
     } catch (error) {
       throw new Error(`Failed to share Google Maps URL: ${error.message}`);
     }
-  };
-  
-  /**
-   * Fetches place details using Google Places API
-   */
-  export const getPlaceDetails = async (placeId) => {
-    const { Map } = await google.maps.importLibrary("maps");
-    const { PlacesService } = await google.maps.importLibrary("places");
-    
-    // Create a temporary map div (required for PlacesService)
-    const mapDiv = document.createElement('div');
-    const map = new Map(mapDiv);
-    const service = new PlacesService(map);
-  
-    return new Promise((resolve, reject) => {
-      service.getDetails(
-        {
-          placeId: placeId,
-          fields: ['name', 'geometry', 'formatted_address']
-        },
-        (place, status) => {
-          if (status === google.maps.places.PlacesServiceStatus.OK) {
-            resolve(place);
-          } else {
-            reject(new Error(`Place details request failed: ${status}`));
-          }
-        }
-      );
-    });
   };
