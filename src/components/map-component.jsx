@@ -1,21 +1,17 @@
 import PropTypes from 'prop-types';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
 import CustomMarker from './custom-marker';
-import { useState } from 'react';
 
 const mapContainerStyle = {
   width: '700px',
   height: '700px',
-  borderRadius: '10px',
-  boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
 };
 
 const center = {
   lat: 38.7169,
   lng: -9.1399,
 };
-
 
 const mapOptions = {
   disableDefaultUI: true,
@@ -41,6 +37,7 @@ const mapOptions = {
 
 function MapComponent({ markers, setMarkers, location, locationPerUser }) {
   const [activeMarker, setActiveMarker] = useState(null);
+  const [inputPosition, setInputPosition] = useState(null);
 
   const handleMapClick = useCallback((event) => {
     if (activeMarker) return;
@@ -52,6 +49,7 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
 
     setMarkers((prevMarkers) => [...prevMarkers, newMarker]);
     setActiveMarker(newMarker);
+    setInputPosition({ x: event.pixel.x, y: event.pixel.y });
   }, [activeMarker, setMarkers]);
 
   const handleSaveNote = (comment) => {
@@ -65,9 +63,9 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
       )
     );
     setActiveMarker(null);
+    setInputPosition(null);
   };
   
-
   const handleDeleteNote = (marker) => {
     setMarkers((prevMarkers) => prevMarkers.filter((m) => m !== marker));
   };
@@ -77,6 +75,7 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
       prevMarkers.filter((marker) => marker.lat !== activeMarker.lat || marker.lng !== activeMarker.lng)
     );
     setActiveMarker(null);
+    setInputPosition(null);
   };
 
   useEffect(() => {
@@ -84,7 +83,7 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
   }, [markers]);
 
   return (
-    <div className="flex justify-center align-middle">
+    <div className="relative flex justify-center">
       <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_API_KEY}>
         <GoogleMap
           id="map"
@@ -93,6 +92,7 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
           zoom={10}
           onClick={handleMapClick}
           options={mapOptions}
+          className="rounded-lg shadow-lg"
         >
           {location.lat && location.lng && (
             <Marker
@@ -122,19 +122,28 @@ function MapComponent({ markers, setMarkers, location, locationPerUser }) {
         </GoogleMap>
       </LoadScript>
 
-      {activeMarker && (
-        <div className="mt-20">
+      {activeMarker && inputPosition && (
+        <div
+          className="absolute bg-white p-4 rounded-lg shadow-md transform -translate-x-1/2 -translate-y-full"
+          style={{ top: inputPosition.y, left: inputPosition.x }}
+        >
           <input
-            value={activeMarker.comment}
+            value={activeMarker.comment || ''}
             onChange={(e) => setActiveMarker({ ...activeMarker, comment: e.target.value })}
             placeholder="Enter comment"
-            className="w-full"
+            className="w-full p-2 border border-gray-300 rounded-md"
           />
-          <div>
-            <button onClick={() => handleSaveNote(activeMarker.comment)} className="mt-10 mr-10 text-white">
+          <div className="flex justify-between mt-2">
+            <button
+              onClick={() => handleSaveNote(activeMarker.comment)}
+              className="px-4 py-2 text-white bg-blue-500 rounded-md"
+            >
               Save Note
             </button>
-            <button onClick={handleCancel} className="bg-gray-500 text-white border-none p-5 cursor-pointer">
+            <button
+              onClick={handleCancel}
+              className="px-4 py-2 text-white bg-gray-500 rounded-md"
+            >
               Cancel
             </button>
           </div>
