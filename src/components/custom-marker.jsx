@@ -2,6 +2,8 @@
 import PropTypes from 'prop-types';
 import {useState} from 'react';
 import { Marker, InfoWindow } from '@react-google-maps/api';
+import { TbBrandGoogleMaps } from "react-icons/tb";
+
 
 const CustomMarker = ({ position, comment, onDelete }) => {
   const [showInfoWindow, setShowInfoWindow] = useState(false);
@@ -28,32 +30,39 @@ const CustomMarker = ({ position, comment, onDelete }) => {
         onClick={handleMarkerClick}
       />
       {showInfoWindow && (
-      <InfoWindow position={position} onCloseClick={handleMarkerClick}>
-        <div className="max-w-[200px] flex flex-col gap-2 align-middle">
-          {comment && ( 
-            <p className="text-sm">
+      <InfoWindow 
+        position={position} 
+        onCloseClick={handleMarkerClick}
+      
+      >
+        <div className="max-w-[220px] rounded-lg bg-white shadow-md flex flex-col gap-3">
+          {comment && (
+            <p className="text-gray-700 text-sm font-medium flex justify-center">
               {comment}
             </p>
           )}
           
-          <div className="flex gap-2 align-middle justify-center">
+          <div className="flex gap-3 justify-center">
             <a 
               href={googleMapsUrl}
-              className="text-xs text-[#007bff] no-underline"
+              className="text-slate-700 hover:text-[#3d8f54] transition-colors flex items-center"
               target="_blank"
               rel="noopener noreferrer"
+              title="View on Google Maps"
             >
-              Open in Google Maps
+              <TbBrandGoogleMaps size={20} />
             </a>
             <button
               onClick={onDelete}
-              className="p-2 font-semibold bg-red-500 rounded-md text-white border-none cursor-pointer"
+              className="px-3 py-1 bg-red-500 text-white rounded-lg hover:bg-red-600 font-semibold transition-all text-balance"
+              title="Delete Marker"
             >
               Delete
             </button>
           </div>
         </div>
       </InfoWindow>
+    
     )}
     </div>
   );
